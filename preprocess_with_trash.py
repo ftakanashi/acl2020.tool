@@ -385,6 +385,18 @@ for y in filter_2:
 fw_1.close()
 fw_2.close()
 
+fw_1 = open(f'{f1}.trash', 'w', encoding='utf-8')
+fw_2 = open(f'{f2}.trash', 'w', encoding='utf-8')
+
+assert len(filter_out_1) == len(filter_out_2)
+print(f'Filtered out {len(filter_out_1)} pairs')
+
+for l1,l2 in zip(filter_out_1, filter_out_2):
+    fw_1.write(l1.strip() + '\n')
+    fw_2.write(l2.strip() + '\n')
+
+fw_1.close(), fw_2.close()
+
 # def sbcdbc(x_in, y_in):
 #   x_out = []
 #   y_out = []
