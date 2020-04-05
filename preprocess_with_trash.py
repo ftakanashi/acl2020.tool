@@ -64,18 +64,15 @@ def dup_remove(x_in, y_in):
 def src_tgt_same_remove(x_in, y_in):
     x_out = []
     y_out = []
-    x_trash, y_trash = [], []
     for (x, y) in zip(x_in, y_in):
         if x.strip() == y.strip():
-            x_trash.append(x.strip())
-            y_trash.append(y.strip())
             continue
         x_out.append(x.strip())
         y_out.append(y.strip())
 
     assert len(x_out) == len(y_out)
     print('After removing same source and target sentence, remain %i pairs' % len(x_out))
-    return x_out, y_out, x_trash, y_trash
+    return x_out, y_out
 
 
 # 去掉太长或者太短的句子
@@ -348,8 +345,7 @@ f2_all_lines = fr_2.readlines()
 
 filter_1, filter_2 = norm(f1_all_lines, f2_all_lines)
 filter_1, filter_2 = dup_remove(filter_1, filter_2)
-filter_1, filter_2, x_trash, y_trash = src_tgt_same_remove(filter_1, filter_2)
-filter_out_1.extend(x_trash), filter_out_2.extend(y_trash)
+filter_1, filter_2 = src_tgt_same_remove(filter_1, filter_2)
 filter_1, filter_2, x_trash, y_trash = sentence_len_remove(filter_1, filter_2)
 filter_out_1.extend(x_trash), filter_out_2.extend(y_trash)
 filter_1, filter_2 = sp_punc_remove(filter_1, filter_2)
@@ -390,7 +386,7 @@ fw_1 = open(f'{f1}.trash', 'w', encoding='utf-8')
 fw_2 = open(f'{f2}.trash', 'w', encoding='utf-8')
 
 assert len(filter_out_1) == len(filter_out_2)
-print(f'Filtered out {len(filter_out_1)} pairs')
+print(f'{len(filter_out_1)} pairs are put into trash bin, waiting for recycle.')
 
 for l1,l2 in zip(filter_out_1, filter_out_2):
     fw_1.write(l1.strip() + '\n')
