@@ -64,15 +64,18 @@ def dup_remove(x_in, y_in):
 def src_tgt_same_remove(x_in, y_in):
     x_out = []
     y_out = []
+    x_trash, y_trash = [], []
     for (x, y) in zip(x_in, y_in):
         if x.strip() == y.strip():
+            x_trash.append(x.strip())
+            y_trash.append(y.strip())
             continue
         x_out.append(x.strip())
         y_out.append(y.strip())
 
     assert len(x_out) == len(y_out)
     print('After removing same source and target sentence, remain %i pairs' % len(x_out))
-    return x_out, y_out
+    return x_out, y_out, x_trash, y_trash
 
 
 # 去掉太长或者太短的句子
@@ -333,6 +336,19 @@ def langid_remove(x_in, y_in):
     return x_out, y_out
 
 
+def write_subfile(fn, x_trash, y_trash):
+    import os
+    os.makedirs('tmp', exist_ok=True)
+    fw_x = open(f'tmp/{fn}.zh', 'w')
+    fw_y = open(f'tmp/{fn}.ja', 'w')
+
+    for x, y in zip(x_trash, y_trash):
+        fw_x.write(f'{x.strip()}\n')
+        fw_y.write(f'{y.strip()}\n')
+
+    fw_x.close()
+    fw_y.close()
+
 filter_1 = []
 filter_2 = []
 filter_out_1, filter_out_2 = [], []
@@ -345,24 +361,25 @@ f2_all_lines = fr_2.readlines()
 
 filter_1, filter_2 = norm(f1_all_lines, f2_all_lines)
 filter_1, filter_2 = dup_remove(filter_1, filter_2)
-filter_1, filter_2 = src_tgt_same_remove(filter_1, filter_2)
+filter_1, filter_2, x_trash, y_trash = src_tgt_same_remove(filter_1, filter_2)
+filter_out_1.extend(x_trash), filter_out_2.extend(y_trash), write_subfile('src_tgt_same_remove', x_trash, y_trash)
 filter_1, filter_2, x_trash, y_trash = sentence_len_remove(filter_1, filter_2)
-# filter_out_1.extend(x_trash), filter_out_2.extend(y_trash)
+filter_out_1.extend(x_trash), filter_out_2.extend(y_trash), write_subfile('sentence_len_remove', x_trash, y_trash)
 filter_1, filter_2 = sp_punc_remove(filter_1, filter_2)
 filter_1, filter_2 = sp_char_remove(filter_1, filter_2)
 filter_1, filter_2, x_trash, y_trash = punc_ratio_remove(filter_1, filter_2)
-filter_out_1.extend(x_trash), filter_out_2.extend(y_trash)
+filter_out_1.extend(x_trash), filter_out_2.extend(y_trash), write_subfile('punc_ratio_remove', x_trash, y_trash)
 filter_1, filter_2, x_trash, y_trash = numalp_ratio_remove(filter_1, filter_2)
-filter_out_1.extend(x_trash), filter_out_2.extend(y_trash)
+filter_out_1.extend(x_trash), filter_out_2.extend(y_trash), write_subfile('numalp_ratio_remove', x_trash, y_trash)
 filter_1, filter_2, x_trash, y_trash = st_numalp_ratio_remove(filter_1, filter_2)
-filter_out_1.extend(x_trash), filter_out_2.extend(y_trash)
+filter_out_1.extend(x_trash), filter_out_2.extend(y_trash), write_subfile('st_numalp_ratio_remove', x_trash, y_trash)
 filter_1, filter_2 = html_remove(filter_1, filter_2)
 filter_1, filter_2 = x_remove(filter_1, filter_2)
 filter_1, filter_2, x_trash, y_trash = nonzhja_ratio_remove(filter_1, filter_2)
-filter_out_1.extend(x_trash), filter_out_2.extend(y_trash)
+filter_out_1.extend(x_trash), filter_out_2.extend(y_trash), write_subfile('nonzhja_ratio_remove', x_trash, y_trash)
 filter_1, filter_2, x_trash, y_trash = emoji_remove(filter_1, filter_2)
-filter_out_1.extend(x_trash), filter_out_2.extend(y_trash)
-filter_1, filter_2 = langid_remove(filter_1, filter_2)
+filter_out_1.extend(x_trash), filter_out_2.extend(y_trash), write_subfile('emoji_remove', x_trash, y_trash)
+# filter_1, filter_2 = langid_remove(filter_1, filter_2)
 
 fr_1.close()
 fr_2.close()
