@@ -4,6 +4,7 @@ import argparse
 from string import punctuation
 import langid
 import unicodedata
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('src', help='source file')
@@ -322,7 +323,7 @@ def langid_remove(x_in, y_in):
     x_out = []
     y_out = []
 
-    for (x, y) in zip(x_in, y_in):
+    for (x, y) in tqdm(zip(x_in, y_in), mininterval=1.0, ncols=50):
         x = x.strip()
         y = y.strip()
         if langid.classify(x)[0] != 'zh' or langid.classify(y)[0] != 'ja':
