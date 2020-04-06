@@ -322,18 +322,21 @@ def emoji_remove(x_in, y_in):
 def langid_remove(x_in, y_in):
     x_out = []
     y_out = []
+    x_trash, y_trash = [], []
 
     for (x, y) in tqdm(zip(x_in, y_in), mininterval=1.0, ncols=50):
         x = x.strip()
         y = y.strip()
         if langid.classify(x)[0] != 'zh' or langid.classify(y)[0] != 'ja':
+            x_trash.append(x.strip())
+            y_trash.append(y.strip())
             continue
         x_out.append(x.strip())
         y_out.append(y.strip())
 
     assert len(x_out) == len(y_out)
     print('After removing sentences with other language, remain %i pairs' % len(x_out))
-    return x_out, y_out
+    return x_out, y_out, x_trash, y_trash
 
 
 def write_subfile(fn, x_trash, y_trash):
@@ -380,7 +383,8 @@ filter_1, filter_2, x_trash, y_trash = nonzhja_ratio_remove(filter_1, filter_2)
 # filter_out_1.extend(x_trash), filter_out_2.extend(y_trash), write_subfile('nonzhja_ratio_remove', x_trash, y_trash)
 filter_1, filter_2, x_trash, y_trash = emoji_remove(filter_1, filter_2)
 filter_out_1.extend(x_trash), filter_out_2.extend(y_trash), write_subfile('emoji_remove', x_trash, y_trash)
-filter_1, filter_2 = langid_remove(filter_1, filter_2)
+filter_1, filter_2, x_trash, y_trash = langid_remove(filter_1, filter_2)
+filter_out_1.extend(x_trash), filter_out_2.extend(y_trash)
 
 fr_1.close()
 fr_2.close()
