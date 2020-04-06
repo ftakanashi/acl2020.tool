@@ -400,8 +400,8 @@ for y in filter_2:
 fw_1.close()
 fw_2.close()
 
-fw_1 = open(f'{f1}.trash', 'w', encoding='utf-8')
-fw_2 = open(f'{f2}.trash', 'w', encoding='utf-8')
+fw_1 = open(f'{f1}.trash', 'a', encoding='utf-8')
+fw_2 = open(f'{f2}.trash', 'a', encoding='utf-8')
 
 assert len(filter_out_1) == len(filter_out_2)
 print(f'{len(filter_out_1)} pairs are put into trash bin, waiting for recycle.')
