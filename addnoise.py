@@ -7,6 +7,8 @@ import random
 import sys
 import torch
 
+from tqdm import tqdm
+
 #cat monolingual.de | python $BPEROOT/apply_bpe.py -c code | python interactive.py $DATA --path model.pt --buffer-size 1024 --beam 5 --batch-size 16 |grep -P '^H' |cut -f3- | sed 's/@@\s*//g' | python addnoise.py > translation.en
 
 def main():
@@ -20,7 +22,7 @@ def main():
     sk = args.sk
 
     # for s in fileinput.input('-'):
-    for s in sys.stdin.read().split('\n'):
+    for s in tqdm(sys.stdin.read().split('\n'), mininterval=0.5, ncols=50):
         s = s.strip().split()
         if len(s) > 0:
             s = word_shuffle(s, sk)
